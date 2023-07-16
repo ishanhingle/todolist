@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as React from 'react';
+import Todo from "./Todo"
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -8,6 +9,8 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import CommentIcon from '@mui/icons-material/Comment';
+import {v4 as uuid} from 'uuid';
+import Form from "./form";
 
 const initialList = [
     { id: 1, task: "study", completed: true },
@@ -16,38 +19,26 @@ const initialList = [
 ]
 const Todolist = () => {
     const [list, setList] = useState(initialList);
+    const removeItem = (id) => {
+        setList((prev) => (prev.filter((item) => (item.id != id))))
+    }
+    const toggleItem=(id)=>{
+        setList((prev)=>(prev.map((item)=>{
+            if(item.id==id){
+                item.completed=!item.completed;
+            }
+            return item;
+        })))
+    }
+    const addItem=(s)=>{
+       setList(prev=>([...prev,{id:uuid(),task:s,completed:true}]))
+    }
     return (
-        <div>
-            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                {list.map((item) => {
-                    const labelId = `checkbox-list-label-${item.id}`;
-
-                    return (
-                        <ListItem
-                            key={item.id}
-                            secondaryAction={
-                                <IconButton edge="end" aria-label="comments">
-                                    <CommentIcon />
-                                </IconButton>
-                            }
-                            disablePadding
-                        >
-                            <ListItemButton role={undefined}  dense>
-                                <ListItemIcon>
-                                    <Checkbox
-                                        edge="start"
-                                        checked={item.completed}
-                                        tabIndex={-1}
-                                        disableRipple
-                                        inputProps={{ 'aria-labelledby': labelId }}
-                                    />
-                                </ListItemIcon>
-                                <ListItemText id={labelId} primary={item.task} />
-                            </ListItemButton>
-                        </ListItem>
-                    );
-                })}
+        <div >
+            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper',textAlign:"center" }}>
+                {list.map((item) => (<Todo item={item} key={item.id} removeItem={removeItem} toggleItem={toggleItem}/>))}
             </List>
+            <Form addItem={addItem}/>
         </div>
     )
 }
